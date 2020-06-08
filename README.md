@@ -1,2 +1,2 @@
-# MedRating - тестовое задание
+# МедРейтинг - тестовое задание
 >[GitHub Pages](https://perpointt.github.io/MedRating/)
