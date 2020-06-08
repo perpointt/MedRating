@@ -1,1 +1,1 @@
-# test-task-MedRating
+# MedRating - тестовое задание
