@@ -19,8 +19,9 @@ li::before {
     position: absolute;
 }
 
-.album__img {
+.album__img:hover {
     cursor: pointer;
+    opacity: 0.9;
 }
 .tabs__user.active::before,
 .tabs__album.active::before {
