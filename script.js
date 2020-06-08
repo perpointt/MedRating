@@ -229,12 +229,14 @@ class Modal {
     document.body.appendChild(modal)
     this.modal = modal
     this.setModalListener()
+    document.body.style.overflow = "hidden"
   }
   setModalListener() {
     const overlay = document.querySelector(".modal__bg")
 
     overlay.addEventListener("click", () => {
       this.modal.parentNode.removeChild(this.modal)
+      document.body.style.overflow = "auto"
     })
   }
 }
