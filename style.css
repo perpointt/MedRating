@@ -1,0 +1,128 @@
+li {
+  list-style: none;
+  width: max-content;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+.headers {
+  display: flex;
+  justify-content: center;
+}
+
+.headers__tab-item {
+  margin: 20px 50px;
+  color: blue;
+  font-size: 18px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  user-select: none;
+}
+
+.headers__tab-item:hover {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.tabs__tab-content {
+  display: none;
+}
+
+.tabs__tab-content.active {
+  display: block;
+}
+
+.tabs__tree span {
+  cursor: pointer;
+}
+
+.hide::before {
+  content: "\003E";
+}
+
+.show::before {
+  content: "\2193";
+}
+
+.tabs__album-list,
+.tabs__tree,
+.tabs__photos-list,
+.tabs__save-list {
+  margin-left: 20px;
+}
+
+.tabs__photo {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.tabs__image {
+  max-width: 150px;
+  max-height: 150px;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+.tabs__star {
+  cursor: initial;
+  position: relative;
+  width: 50px;
+  height: 50px;
+  display: block;
+}
+
+.tabs__star::before {
+  content: "★";
+  position: absolute;
+  font-size: 40px;
+  color: lightgrey;
+  cursor: pointer;
+}
+
+.tabs__star_clicked::before {
+  color: gold;
+}
+
+/* modal */
+
+.modal.open .modal__overlay,
+.modal.open .modal__window {
+  opacity: 1;
+  z-index: 1000;
+}
+
+.modal__window,
+.modal__overlay {
+  opacity: 0;
+  z-index: -1;
+}
+
+.modal__overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal__window {
+  width: max-content;
+  border-radius: 5px;
+  background-color: white;
+  margin: 50px auto;
+}
+
+.modal__header {
+  padding: 5px 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal__close {
+  cursor: pointer;
+}
