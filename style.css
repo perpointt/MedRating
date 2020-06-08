@@ -1,128 +1,103 @@
-li {
-  list-style: none;
-  width: max-content;
-}
-
 ul {
-  margin: 0;
-  padding: 0;
+    list-style-type: none;
+    padding-top: 10px;
+}
+li + li {
+    margin-top: 10px;
+}
+li span:hover {
+    cursor: pointer;
+    color: chocolate;
+}
+li {
+    position: relative;
+}
+li::before {
+    content: ">";
+    left: -15px;
+    font-size: 18px;
+    position: absolute;
 }
 
-.headers {
-  display: flex;
-  justify-content: center;
+.album__img {
+    cursor: pointer;
+}
+.tabs__user.active::before,
+.tabs__album.active::before {
+    transform: rotate(90deg);
+}
+.tabs__user.active .user__span,
+.tabs__album.active .album__span {
+    color: darkblue;
+}
+.tabs__photos::before {
+    content: "";
+}
+.photo__star::before {
+    content: "★";
+    position: absolute;
+    font-size: 40px;
+    color: lightgrey;
+    cursor: pointer;
+    left: -50px;
+    top: 50px;
+}
+.photo__star:hover::before {
+    opacity: 0.8;
+}
+.favourite.photo__star::before {
+    color: gold;
+}
+.favourite__photos::before {
+    content: "";
+}
+.header {
+    display: flex;
+    justify-content: center;
+    text-transform: uppercase;
+    color: CornflowerBlue;
+    padding-top: 30px;
+}
+.header__tab-link:hover {
+    cursor: pointer;
+    color: blue;
+}
+.header__tab-link.active {
+    color: Orchid;
+    cursor: default;
+}
+.header__tab-link + .header__tab-link {
+    margin-left: 20px;
+}
+.tabs {
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+}
+.tab {
+    display: none;
+}
+.tab.active {
+    display: block;
 }
 
-.headers__tab-item {
-  margin: 20px 50px;
-  color: blue;
-  font-size: 18px;
-  text-transform: uppercase;
-  text-decoration: underline;
-  user-select: none;
+.modal {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
 }
-
-.headers__tab-item:hover {
-  cursor: pointer;
-  text-decoration: none;
+.modal__img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
 }
-
-.tabs__tab-content {
-  display: none;
-}
-
-.tabs__tab-content.active {
-  display: block;
-}
-
-.tabs__tree span {
-  cursor: pointer;
-}
-
-.hide::before {
-  content: "\003E";
-}
-
-.show::before {
-  content: "\2193";
-}
-
-.tabs__album-list,
-.tabs__tree,
-.tabs__photos-list,
-.tabs__save-list {
-  margin-left: 20px;
-}
-
-.tabs__photo {
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: flex-end;
-}
-
-.tabs__image {
-  max-width: 150px;
-  max-height: 150px;
-  cursor: pointer;
-  margin-left: 20px;
-}
-
-.tabs__star {
-  cursor: initial;
-  position: relative;
-  width: 50px;
-  height: 50px;
-  display: block;
-}
-
-.tabs__star::before {
-  content: "★";
-  position: absolute;
-  font-size: 40px;
-  color: lightgrey;
-  cursor: pointer;
-}
-
-.tabs__star_clicked::before {
-  color: gold;
-}
-
-/* modal */
-
-.modal.open .modal__overlay,
-.modal.open .modal__window {
-  opacity: 1;
-  z-index: 1000;
-}
-
-.modal__window,
-.modal__overlay {
-  opacity: 0;
-  z-index: -1;
-}
-
-.modal__overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.modal__window {
-  width: max-content;
-  border-radius: 5px;
-  background-color: white;
-  margin: 50px auto;
-}
-
-.modal__header {
-  padding: 5px 10px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.modal__close {
-  cursor: pointer;
+.modal__bg {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: #000;
+    opacity: 0.5;
 }

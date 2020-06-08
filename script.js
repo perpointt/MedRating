@@ -1,278 +1,250 @@
-class TabList {
-  constructor(headersContainer, tabs) {
-    this.headersContainer = headersContainer
+class TabLinks {
+  constructor(links, tabs) {
+    this.links = links
     this.tabs = tabs
-
-    this.headersContainer.addEventListener("click", (e) => {
-      const index = e.target.closest(".headers__tab-item").dataset.value
-
-      this.openTab(index)
+    this.links.forEach((link) => {
+      link.addEventListener("click", () => {
+        this.openCurrentTab(link)
+      })
     })
   }
+  openCurrentTab(link) {
+    this.tabs.forEach((tab) => {
+      if (tab.dataset.value === link.dataset.value) {
+        const activeTab = document.querySelector(".tab.active")
+        const activeLink = document.querySelector(".header__tab-link.active")
 
-  openTab(index) {
-    const tabActive = this.tabs.querySelector(".active")
-    tabActive.classList.remove("active")
+        activeTab.classList.remove("active")
+        activeLink.classList.remove("active")
 
-    const newTabActive = this.tabs.querySelector(`.tab-${index}`)
-    newTabActive.classList.add("active")
+        switch (parseInt(tab.dataset.value)) {
+          case 1:
+            const users = new Users()
+            users.fetchUsers()
+            break
+          case 2:
+            const favourite = new Favourites()
+            favourite.outputFavourites()
+            break
+        }
+
+        link.classList.add("active")
+        tab.classList.add("active")
+      }
+    })
   }
 }
-
-class Fetching {
-  constructor() {
-    this.users = []
-    this.modal = ""
-  }
-
-  async getUsers() {
+class Users {
+  async fetchUsers() {
     try {
       const response = await fetch("https://json.medrating.org/users/")
       const data = await response.json()
+
       this.users = data
-      this.getAlbums()
       this.outputUsers()
     } catch (e) {
       console.log(`Error: ${e}`)
     }
   }
-
-  async getAlbums() {
-    for (let index in this.users) {
-      try {
-        const response = await fetch(
-          `https://json.medrating.org/albums?userId=${index}`
-        )
-        const data = await response.json()
-        this.users[index].albums = data
-      } catch (e) {
-        console.log(`Error: ${e}`)
-      }
-    }
-
-    this.outputAlbums()
-  }
-
   outputUsers() {
-    const tree = document.querySelector("#tree")
+    const tree = document.querySelector("#tab-list")
 
+    tree.innerHTML = ``
     this.users.map((user) => {
       if (user.name) {
-        const userEl = document.createElement("li")
-        userEl.classList.add("tabs__user")
-        userEl.textContent = user.name
-        tree.appendChild(userEl)
+        tree.insertAdjacentHTML(
+          "afterbegin",
+          `
+            <li class="tabs__user">
+            <span class="user__span" data-id="${user.id}">${user.name}</span>
+            </li>
+          `
+        )
+        const span = tree.querySelector("span")
+        this.setUserListener(span, user)
       }
     })
   }
-
-  outputAlbums() {
-    const allUsers = document.querySelectorAll(".tabs__user")
-
-    this.users.map((user, userIndex) => {
-      if (user.name) {
-        const albumUl = document.createElement("ul")
-        albumUl.classList.add("tabs__album-list")
-
-        user.albums.map((album, albumIndex) => {
-          const albumLi = document.createElement("li")
-          albumLi.classList.add("tabs__album")
-          albumLi.textContent = album.title
-
-          albumUl.appendChild(albumLi)
-
-          this.setAlbumListener(albumLi, album, userIndex, albumIndex)
-        })
-
-        allUsers[userIndex].appendChild(albumUl)
-      }
-    })
-
-    this.toggleList()
-  }
-
-  setAlbumListener(albumLi, albumObj, userIndex, albumIndex) {
-    albumLi.addEventListener("click", () => {
-      if (!albumObj.photos) {
-        this.getPhotos(albumObj.id, userIndex, albumIndex)
-      }
+  setUserListener(span, user) {
+    span.addEventListener("click", () => {
+      const album = new Albums()
+      album.fetchAlbums(span, user)
     })
   }
-
-  async getPhotos(id, userIndex, albumIndex) {
+}
+class Albums {
+  async fetchAlbums(span, user) {
     try {
       const response = await fetch(
-        `https://json.medrating.org/photos?albumId=${id}`
+        `https://json.medrating.org/albums?userId=${user.id}`
       )
       const data = await response.json()
 
-      this.users[userIndex].albums[albumIndex].photos = data
-
-      this.outputPhotos(userIndex, albumIndex)
+      this.outputAlbums(span.parentNode, data)
     } catch (e) {
       console.log(`Error: ${e}`)
     }
   }
+  outputAlbums(list, data) {
+    if (list.querySelector("ul")) {
+      list.classList.remove("active")
+      list.querySelector("ul").remove()
+    } else {
+      const albumUl = document.createElement("ul")
 
-  outputPhotos(userIndex, albumIndex) {
-    const allUsers = document.querySelectorAll(".tabs__user")
-    const allAlbums = allUsers[userIndex].querySelectorAll(".tabs__album")
-    const albumLi = allAlbums[albumIndex]
-    const photosUl = document.createElement("ul")
-    photosUl.classList.add("tabs__photos-list")
+      albumUl.classList.add("tabs__album-list")
+      data.map((album) => {
+        list.classList.add("active")
+        albumUl.insertAdjacentHTML(
+          "afterbegin",
+          `
+            <li class="tabs__album">
+                <span class="album__span">${album.title}</span>
+            </li>
+          `
+        )
+        const span = albumUl.querySelector("span")
 
-    this.users[userIndex].albums[albumIndex].photos.map((photo) => {
-      this.automatizationOutput(photo, photosUl, false)
-    })
-
-    albumLi.appendChild(photosUl)
+        this.setAlbumListener(span, album)
+      })
+      list.appendChild(albumUl)
+    }
   }
+  setAlbumListener(span, album) {
+    span.addEventListener("click", () => {
+      const photos = new Photos()
+      photos.fetchPhotos(span, album)
+    })
+  }
+}
+class Photos {
+  async fetchPhotos(span, album) {
+    try {
+      const response = await fetch(
+        `https://json.medrating.org/photos?albumId=${album.id}`
+      )
+      const data = await response.json()
+      this.outputPhotos(span.parentNode, data)
+    } catch (e) {
+      console.log(`Error: ${e}`)
+    }
+  }
+  outputPhotos(list, data) {
+    if (list.querySelector("ul")) {
+      list.classList.remove("active")
+      list.querySelector("ul").remove()
+    } else {
+      const photosUl = document.createElement("ul")
 
-  createModal(src, title, id) {
+      photosUl.classList.add("tabs__photos-list")
+      data.map((album) => {
+        list.classList.add("active")
+        photosUl.insertAdjacentHTML(
+          "afterbegin",
+          `
+            <li class="tabs__photos">
+              <span class="photo__star"></span>
+              <img class="album__img" src="${album.thumbnailUrl}" title="${album.title}">
+            </li>
+          `
+        )
+        const star = photosUl.querySelector("span")
+        const photo = photosUl.querySelector("img")
+
+        if (localStorage.getItem(album.id)) {
+          star.classList.add("favourite")
+        }
+        const favourites = new Favourites()
+        favourites.setStarListener(star, album)
+        this.setPhotoListener(photo, album.url)
+      })
+      list.appendChild(photosUl)
+    }
+  }
+  setPhotoListener(photo, url) {
+    photo.addEventListener("click", () => {
+      const modal = new Modal()
+      modal.createModal(url)
+    })
+  }
+}
+class Favourites {
+  outputFavourites() {
+    const favourite = document.querySelector("#favourite-list")
+
+    favourite.innerHTML = ``
+    let keys = Object.keys(localStorage)
+    for (let key of keys) {
+      const album = JSON.parse(localStorage.getItem(key))
+      favourite.insertAdjacentHTML(
+        "afterbegin",
+        `
+          <li class="favourite__photos">
+            <span class="photo__star"></span>
+            <img class="album__img" src="${album.thumbnailUrl}" title="${album.title}">
+          </li>
+        `
+      )
+      const star = favourite.querySelector("span")
+      const photo = favourite.querySelector("img")
+
+      if (localStorage.getItem(album.id)) {
+        star.classList.add("favourite")
+      }
+      localStorage.setItem(album.id, JSON.stringify(album))
+      this.setStarListener(star, album)
+
+      const photos = new Photos()
+      photos.setPhotoListener(photo, album.url)
+    }
+  }
+  setStarListener(star, album) {
+    star.addEventListener("click", () => {
+      if (localStorage.getItem(album.id)) {
+        star.classList.remove("favourite")
+        localStorage.removeItem(album.id)
+        this.outputFavourites()
+      } else {
+        star.classList.add("favourite")
+        localStorage.setItem(album.id, JSON.stringify(album))
+      }
+    })
+  }
+}
+class Modal {
+  constructor() {
+    this.modal = ""
+  }
+  createModal(url) {
     const modal = document.createElement("div")
+
     modal.classList.add("modal")
-    modal.classList.add("open")
     modal.insertAdjacentHTML(
       "afterbegin",
       `
-      <div class="modal__overlay">
-        <div class="modal__window">
-          <div class="modal__header">
-            <h2 class="modal__title">Картинка ${id}</h2>
-            <span class="modal__close" data-close="true">&times;</span>
-          </div>
-          <div class="modal__body">
-            <img src="${src}" title="${title}">
-          </div>
-        </div>
-      </div>
-    `
+        <img class="modal__img" src="${url}" alt="">
+        <div class="modal__bg"></div>
+      `
     )
     document.body.appendChild(modal)
     this.modal = modal
-
-    this.modal.addEventListener("click", this.listenerModal)
+    this.setModalListener()
   }
+  setModalListener() {
+    const overlay = document.querySelector(".modal__bg")
 
-  listenerModal = (e) => {
-    if (
-      e.target.dataset.close ||
-      e.target.classList.contains("modal__overlay")
-    ) {
-      this.closeModal()
-    }
-  }
-
-  closeModal() {
-    this.modal.classList.remove("open")
-    this.modal.parentNode.removeChild(this.modal)
-    this.modal.removeEventListener("click", this.listenerModal)
-  }
-
-  outputSavePhotos() {
-    const saveList = document.querySelector("#save-list")
-
-    let keys = Object.keys(localStorage)
-    for (let key of keys) {
-      const itemObj = JSON.parse(localStorage.getItem(key))
-
-      this.automatizationOutput(itemObj, saveList, true)
-    }
-  }
-
-  automatizationOutput(photoObj, whenNode, isFavorites) {
-    const photoLi = document.createElement("li")
-    photoLi.classList.add("tabs__photo")
-
-    const photoStar = document.createElement("span")
-    photoStar.classList.add("tabs__star")
-
-    const photoImg = document.createElement("img")
-    photoImg.classList.add("tabs__image")
-    photoImg.src = photoObj.url
-    photoImg.title = photoObj.title
-
-    photoLi.appendChild(photoImg)
-    photoLi.appendChild(photoStar)
-    whenNode.appendChild(photoLi)
-
-    if (localStorage.getItem(photoObj.id)) {
-      photoStar.classList.add("tabs__star_clicked")
-    }
-
-    this.setStarListener(photoStar, photoObj, isFavorites)
-    this.setImageListener(photoImg, photoObj)
-  }
-
-  setStarListener(photoStar, photoObj, isFavorites) {
-    photoStar.addEventListener("click", (e) => {
-      e.preventDefault()
-
-      if (localStorage.getItem(photoObj.id)) {
-        localStorage.removeItem(photoObj.id)
-        photoStar.classList.remove("tabs__star_clicked")
-
-        if (isFavorites) {
-          const parent = e.target.parentNode
-          parent.removeChild(e.target)
-          parent.parentNode.removeChild(parent)
-        }
-      } else {
-        localStorage.setItem(photoObj.id, JSON.stringify(photoObj))
-        photoStar.classList.add("tabs__star_clicked")
-      }
-    })
-  }
-
-  setImageListener(photoImg, photoObj) {
-    photoImg.addEventListener("click", () => {
-      this.createModal(photoObj.url, photoObj.title, photoObj.id)
-    })
-  }
-
-  toggleList() {
-    const tree = document.querySelector("#tree")
-
-    for (let li of tree.querySelectorAll("li")) {
-      const span = document.createElement("span")
-      span.classList.add("show")
-      li.prepend(span)
-      span.append(span.nextSibling)
-    }
-
-    tree.addEventListener("click", (e) => {
-      e.preventDefault()
-
-      if (e.target.tagName !== "SPAN") {
-        return
-      }
-
-      const childrenContainer = e.target.parentNode.querySelector("ul")
-
-      if (!childrenContainer) {
-        return
-      }
-
-      childrenContainer.hidden = !childrenContainer.hidden
-
-      if (childrenContainer.hidden) {
-        event.target.classList.add("hide")
-        event.target.classList.remove("show")
-      } else {
-        event.target.classList.add("show")
-        event.target.classList.remove("hide")
-      }
+    overlay.addEventListener("click", () => {
+      this.modal.parentNode.removeChild(this.modal)
     })
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const headersContainer = document.querySelector(".headers")
-  const tabs = document.querySelector(".tabs")
+  const links = document.querySelectorAll(".header__tab-link")
+  const tabs = document.querySelectorAll(".tab")
 
-  const tabList = new TabList(headersContainer, tabs)
+  const tabList = new TabLinks(links, tabs)
 
-  const FetchingObj = new Fetching()
-  FetchingObj.getUsers()
-  FetchingObj.outputSavePhotos()
+  const users = new Users()
+  users.fetchUsers()
 })

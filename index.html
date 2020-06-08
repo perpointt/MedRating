@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./normalize.css" />
-    <link rel="stylesheet" href="./style.css" />
-    <title>test</title>
-  </head>
-  <body>
-    <div class="headers">
-      <div class="headers__tab-item" data-value="1">Каталог</div>
-      <div class="headers__tab-item" data-value="2">Избранное</div>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="normalize.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Тестовое задание - МедРейтинг</title>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header__tab-link active" data-value="1">Каталог</div>
+        <div class="header__tab-link" data-value="2">Избранное</div>
     </div>
-
     <div class="tabs">
-      <div class="tabs__tab-content tab-1 active">
-        <ul class="tabs__tree" id="tree"></ul>
-      </div>
-
-      <div class="tabs__tab-content tab-2">
-        <ul class="tabs__save-list" id="save-list"></ul>
-      </div>
+        <div class="tab tab-1 active" data-value="1">
+            <ul class="tab-list" id="tab-list"></ul>
+        </div>
+        <div class="tab tab-2" data-value="2">
+            <ul class="favourite-list" id="favourite-list"></ul>
+        </div>
     </div>
 
     <script src="script.js"></script>
-  </body>
+</body>
+
 </html>
