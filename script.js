@@ -47,12 +47,12 @@ class Users {
     }
   }
   outputUsers() {
-    const tree = document.querySelector("#tab-list")
+    const list = document.querySelector("#tab-list")
 
-    tree.innerHTML = ``
+    list.innerHTML = ``
     this.users.map((user) => {
       if (user.name) {
-        tree.insertAdjacentHTML(
+        list.insertAdjacentHTML(
           "afterbegin",
           `
             <li class="tabs__user">
@@ -60,7 +60,7 @@ class Users {
             </li>
           `
         )
-        const span = tree.querySelector("span")
+        const span = list.querySelector("span")
         this.setUserListener(span, user)
       }
     })
@@ -176,26 +176,28 @@ class Favourites {
     let keys = Object.keys(localStorage)
     for (let key of keys) {
       const album = JSON.parse(localStorage.getItem(key))
-      favourite.insertAdjacentHTML(
-        "afterbegin",
-        `
-          <li class="favourite__photos">
-            <span class="photo__star"></span>
-            <img class="album__img" src="${album.thumbnailUrl}" title="${album.title}">
-          </li>
-        `
-      )
-      const star = favourite.querySelector("span")
-      const photo = favourite.querySelector("img")
+      if (album.id) {
+        favourite.insertAdjacentHTML(
+          "afterbegin",
+          `
+            <li class="favourite__photos">
+              <span class="photo__star"></span>
+              <img class="album__img" src="${album.thumbnailUrl}" title="${album.title}">
+            </li>
+          `
+        )
+        const star = favourite.querySelector("span")
+        const photo = favourite.querySelector("img")
 
-      if (localStorage.getItem(album.id)) {
-        star.classList.add("favourite")
+        if (localStorage.getItem(album.id)) {
+          star.classList.add("favourite")
+        }
+        localStorage.setItem(album.id, JSON.stringify(album))
+        this.setStarListener(star, album)
+
+        const photos = new Photos()
+        photos.setPhotoListener(photo, album.url)
       }
-      localStorage.setItem(album.id, JSON.stringify(album))
-      this.setStarListener(star, album)
-
-      const photos = new Photos()
-      photos.setPhotoListener(photo, album.url)
     }
   }
   setStarListener(star, album) {
